@@ -16,19 +16,19 @@
                 <input type="text" class="form-control" name="searchText" id="searchText" required>
             </div>
             <div class="form-group">
-                <label for="image">Upload Image</label>
-                <input type="file" class="form-control" name="image" id="image" required>
+                <label for="file">Upload Image or PDF</label>
+                <input type="file" class="form-control" name="file" id="file" accept="image/*,application/pdf" required>
             </div>
-            <button type="submit" class="btn btn-primary">Process Image</button>
+            <button type="submit" class="btn btn-primary">Process File</button>
         </form>
 
         @isset($found)
             <div class="mt-5">
                 <h4>Search Result:</h4>
                 @if ($found)
-                    <div class="alert alert-success">Text found in the image!</div>
+                    <div class="alert alert-success">Text found in the file!</div>
                 @else
-                    <div class="alert alert-danger">Text not found in the image.</div>
+                    <div class="alert alert-danger">Text not found in the file.</div>
                 @endif
             </div>
         @endisset

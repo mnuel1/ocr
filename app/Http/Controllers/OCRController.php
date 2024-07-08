@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use thiagoalessio\TesseractOCR\TesseractOCR;
+use Spatie\PdfToText\Pdf;
 
 class OCRController extends Controller
 {
@@ -16,17 +17,28 @@ class OCRController extends Controller
     {
         $request->validate([
             'searchText' => 'required|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'file' => 'required|file|mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
         ]);
 
         $searchText = $request->input('searchText');
-        $imagePath = $request->file('image')->store('uploads', 'public');
+        $file = $request->file('file');
+        $filePath = $file->store('uploads', 'public');
 
-        $ocr = new TesseractOCR(storage_path('app/public/' . $imagePath));
-        $extractedText = $ocr->run();
+        $extractedText = '';
+
+        if ($file->getClientOriginalExtension() === 'pdf') {
+            $pdfPath = storage_path('app/public/' . $filePath);
+            $pdftotextPath = config('pdftotext.path');
+            $extractedText = (new Pdf($pdftotextPath))->setPdf($pdfPath)->text();
+        } else {
+            $imagePath = storage_path('app/public/' . $filePath);
+            $ocr = new TesseractOCR($imagePath);
+            $extractedText = $ocr->run();
+        }
 
         $found = stripos($extractedText, $searchText) !== false;
 
         return view('ocr', compact('found'));
     }
 }
+
